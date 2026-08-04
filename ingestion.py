@@ -1,3 +1,5 @@
+import os
+
 from dotenv import load_dotenv
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -8,31 +10,40 @@ from langchain_ollama import OllamaEmbeddings
 load_dotenv()
 
 
+COLLECTION_NAME = "agentic-rag"
+PERSIST_DIRECTORY = "./.chroma"
+
 urls = [
     "https://lilianweng.github.io/posts/2023-06-23-agent/",
     "https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/",
     "https://lilianweng.github.io/posts/2023-10-25-adv-attack-llm/",
 ]
 
-docs = [WebBaseLoader(url).load() for url in urls]
-docs_list = [item for sublist in docs for item in sublist]
+embeddings = OllamaEmbeddings(model = "nomic-embed-text")
 
-text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-    chunk_size = 250, chunk_overlap = 0
-)
-doc_splits = text_splitter.split_documents(docs_list)
 
-# vectorstore = Chroma.from_documents(
-#     documents = doc_splits,
-#     collection_name = "agentic-rag",
-#     embedding = OllamaEmbeddings(),
-#     persist_directory = "./.chroma",
-# )
+def ingest_docs() -> None:
+    docs = [WebBaseLoader(url).load() for url in urls]
+    docs_list = [item for sublist in docs for item in sublist]
+
+    text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+        chunk_size = 250, chunk_overlap = 0
+    )
+    doc_splits = text_splitter.split_documents(docs_list)
+
+    Chroma.from_documents(
+        documents = doc_splits,
+        collection_name = COLLECTION_NAME,
+        embedding = embeddings,
+        persist_directory = PERSIST_DIRECTORY,
+    )
+
+
+if not os.path.exists(PERSIST_DIRECTORY):
+    ingest_docs()
 
 retriever = Chroma(
-    collection_name = "agentic-rag",
-    persist_directory = "./.chroma",
-    embedding_function = OllamaEmbeddings(),
+    collection_name = COLLECTION_NAME,
+    persist_directory = PERSIST_DIRECTORY,
+    embedding_function = embeddings,
 ).as_retriever()
-
-
