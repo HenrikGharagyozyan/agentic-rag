@@ -1,14 +1,9 @@
-import os
-
 from dotenv import load_dotenv
-
 
 load_dotenv()
 
-
-def main():
-    print("Hello from agentic-rag!")
-    print(os.environ.get("LANGSMITH_API_KEY"))
+from graph.graph import app
 
 if __name__ == "__main__":
-    main()
+    print("Hello Advanced RAG")
+    print(app.invoke(input={"question": "what is agent memory?"}))
