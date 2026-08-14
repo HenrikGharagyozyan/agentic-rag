@@ -1,7 +1,7 @@
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 from langchain_core.runnables import RunnableSequence
-from langchain_ollama import ChatOllama
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 
 class GradeAnswer(BaseModel):
@@ -11,7 +11,10 @@ class GradeAnswer(BaseModel):
     )
 
 
-llm = ChatOllama(model="qwen3:1.7b", temperature = 0)
+llm = ChatGoogleGenerativeAI(
+    model="gemini-3.5-flash",
+    temperature=0,
+)
 structured_llm_grader = llm.with_structured_output(GradeAnswer)
 
 system = """You are a grader assessing whether an answer addresses / resolves a question \n 
