@@ -1,9 +1,14 @@
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
-from langchain_ollama import ChatOllama
+from langchain_google_genai import ChatGoogleGenerativeAI
+# from langchain_ollama import ChatOllama
 
 
-llm = ChatOllama(model="qwen3:1.7b", temperature = 0)
+# llm = ChatOllama(model="qwen3:1.7b", temperature = 0)
+llm = ChatGoogleGenerativeAI(
+    model="gemini-3.5-flash",
+    temperature=0,
+)
 
 class GradeDocuments(BaseModel):
     """Binary score for relevance check on retrieved documents."""
